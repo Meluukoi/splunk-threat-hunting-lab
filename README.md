@@ -81,3 +81,41 @@ The observed behavior aligns with reconnaissance techniques used to identify the
 PowerShell execution spawning `whoami.exe`, demonstrating user discovery activity and parent-child process visibility through Sysmon Event ID 1.
 
 ![PowerShell Reconnaissance Investigation](screenshots/powershell-whoami-hunt.png)
+
+
+# Threat Hunt 2: Authentication Activity Analysis
+
+## Hunting Hypothesis
+
+An attacker may attempt to gain access to a system through repeated authentication attempts followed by a successful logon.
+
+## Hunt Query
+
+```spl
+source="WinEventLog:Security"
+(EventCode=4624 OR EventCode=4625)
+| stats count by EventCode Account_Name
+```
+
+## Findings
+
+The hunt identified both successful and failed authentication activity across multiple accounts.
+
+Analysis revealed:
+
+- Successful logon events (4624)
+- Failed logon events (4625)
+- Interactive user authentication activity
+- System and service account authentication activity
+
+The investigation identified successful logons associated with user accounts and operating system services, while also revealing failed authentication attempts against local accounts.
+
+Correlating successful and failed logon events provides visibility into authentication behavior and assists analysts in identifying password guessing, brute-force activity, and potential account misuse.
+
+## Screenshots
+
+### Authentication Activity Analysis
+
+Authentication activity correlated across successful logons (4624) and failed logons (4625). Statistical analysis was used to identify authentication patterns, account activity, and failed login attempts.
+
+![Authentication Activity Analysis](screenshots/authentication-activity-hunt.png)
